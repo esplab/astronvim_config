@@ -6,24 +6,30 @@ return {
   opts = function()
     -- TODO move after neo-tree improves (https://github.com/nvim-neo-tree/neo-tree.nvim/issues/707)
     local global_commands = {
-      system_open = function(state) require("astronvim.utils").system_open(state.tree:get_node():get_id()) end,
+      system_open = function(state)
+        require("astronvim.utils").system_open(
+          state.tree:get_node():get_id())
+      end,
       parent_or_close = function(state)
         local node = state.tree:get_node()
-        if (node.type == "directory" or node:has_children()) and node:is_expanded() then
+        if (node.type == "directory" or node:has_children()) and
+            node:is_expanded() then
           state.commands.toggle_node(state)
         else
-          require("neo-tree.ui.renderer").focus_node(state, node:get_parent_id())
+          require("neo-tree.ui.renderer").focus_node(state,
+            node:get_parent_id())
         end
       end,
       child_or_open = function(state)
         local node = state.tree:get_node()
         if node.type == "directory" or node:has_children() then
-          if not node:is_expanded() then -- if unexpanded, expand
+          if not node:is_expanded() then           -- if unexpanded, expand
             state.commands.toggle_node(state)
-          else -- if expanded and has children, seleect the next child
-            require("neo-tree.ui.renderer").focus_node(state, node:get_child_ids()[1])
+          else                                     -- if expanded and has children, seleect the next child
+            require("neo-tree.ui.renderer").focus_node(state,
+              node:get_child_ids()[1])
           end
-        else -- if not a directory just open it
+        else         -- if not a directory just open it
           state.commands.open(state)
         end
       end,
@@ -38,29 +44,28 @@ return {
           f = { val = filename, msg = "Filename" },
           F = {
             val = modify(filename, ":r"),
-            msg = "Filename w/o extension",
+            msg = "Filename w/o extension"
           },
           h = {
             val = modify(filepath, ":~"),
-            msg = "Path relative to Home",
+            msg = "Path relative to Home"
           },
           p = {
             val = modify(filepath, ":."),
-            msg = "Path relative to CWD",
+            msg = "Path relative to CWD"
           },
-          P = { val = filepath, msg = "Absolute path" },
+          P = { val = filepath, msg = "Absolute path" }
         }
 
         local messages = {
-          { "\nChoose to copy to clipboard:\n", "Normal" },
+          { "\nChoose to copy to clipboard:\n", "Normal" }
         }
         for i, result in pairs(results) do
           if result.val and result.val ~= "" then
             vim.list_extend(messages, {
-              { ("%s."):format(i), "Identifier" },
+              { ("%s."):format(i),           "Identifier" },
               { (" %s: "):format(result.msg) },
-              { result.val, "String" },
-              { "\n" },
+              { result.val,                  "String" }, { "\n" }
             })
           end
         end
@@ -70,7 +75,7 @@ return {
           vim.notify("Copied: " .. result.val)
           vim.fn.setreg("+", result.val)
         end
-      end,
+      end
     }
     local get_icon = require("astronvim.utils").get_icon
     return {
@@ -79,12 +84,24 @@ return {
       source_selector = {
         winbar = true,
         content_layout = "center",
-        tab_labels = {
-          filesystem = get_icon "FolderClosed" .. " Files",
-          buffers = get_icon "DefaultFile" .. " Buffers",
-          git_status = get_icon "Git" .. " Git",
-          diagnostics = get_icon "Diagnostic" .. " Diagnostic",
-        },
+        sources = {
+          {
+            source = "filesystem",
+            display_name = get_icon "FolderClosed" .. " Files"
+          },
+          {
+            source = "buffers",
+            display_name = get_icon "DefaultFile" .. " Buffers"
+          },
+          {
+            source = "git_status",
+            display_name = get_icon "Git" .. " Git"
+          },
+          {
+            source = "diagnostics",
+            display_name = get_icon "Diagnostic" .. " Diagnostic"
+          }
+        }
       },
       default_component_configs = {
         indent = { padding = 0, indent_size = 1 },
@@ -92,7 +109,7 @@ return {
           folder_closed = get_icon "FolderClosed",
           folder_open = get_icon "FolderOpen",
           folder_empty = get_icon "FolderEmpty",
-          default = get_icon "DefaultFile",
+          default = get_icon "DefaultFile"
         },
         modified = { symbol = get_icon "FileModified" },
         git_status = {
@@ -105,30 +122,30 @@ return {
             ignored = get_icon "GitIgnored",
             unstaged = get_icon "GitUnstaged",
             staged = get_icon "GitStaged",
-            conflict = get_icon "GitConflict",
-          },
-        },
+            conflict = get_icon "GitConflict"
+          }
+        }
       },
       window = {
         width = 50,
         position = "right",
         mappings = {
-          ["<space>"] = false, -- disable space until we figure out which-key disabling
+          ["<space>"] = false,           -- disable space until we figure out which-key disabling
           ["[b"] = "prev_source",
           ["]b"] = "next_source",
           o = "open",
           O = "system_open",
           h = "parent_or_close",
           l = "child_or_open",
-          Y = "copy_selector",
-        },
+          Y = "copy_selector"
+        }
       },
       filesystem = {
         follow_current_file = true,
         hijack_netrw_behavior = "open_current",
         use_libuv_file_watcher = true,
         commands = global_commands,
-        filtered_items = { hide_gitignored = false },
+        filtered_items = { hide_gitignored = false }
       },
       buffers = { commands = global_commands },
       git_status = { commands = global_commands },
@@ -136,9 +153,11 @@ return {
       event_handlers = {
         {
           event = "neo_tree_buffer_enter",
-          handler = function(_) vim.opt_local.signcolumn = "auto" end,
-        },
-      },
+          handler = function(_)
+            vim.opt_local.signcolumn = "auto"
+          end
+        }
+      }
     }
-  end,
+  end
 }
